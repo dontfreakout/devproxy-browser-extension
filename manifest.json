@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "DevProxy Virtual Hosts",
+  "version": "1.0",
+  "description": "Chrome extension for listing local sites served by devproxy",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "http://localhost/*",
+    "https://localhost/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "DevProxy Virtual Hosts",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
