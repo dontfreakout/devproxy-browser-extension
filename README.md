@@ -1,6 +1,6 @@
 # DevProxy Browser Extension
 
-A Chrome extension for listing and accessing local sites served by DevProxy.
+A Chrome extension for listing and accessing local sites served by [DevProxy](https://github.com/dontfreakout/dev-proxy).
 
 ## Features
 
