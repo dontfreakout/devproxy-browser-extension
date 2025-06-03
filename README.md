@@ -45,7 +45,7 @@ A Chrome extension for listing and accessing local sites served by [DevProxy](ht
 
 ## Configuration
 
-The extension expects DevProxy to serve a `vhosts.json` file at `https://localhost:8443/vhosts.json` by default. You can configure a different URL for the `vhosts.json` file using the settings option:
+The extension expects DevProxy to serve a `vhosts.json` file at `https://localhost/vhosts.json` by default. You can configure a different URL for the `vhosts.json` file using the settings option:
 
 1. Click the settings icon (⚙) in the extension popup
 2. Enter your custom URL in the settings form
