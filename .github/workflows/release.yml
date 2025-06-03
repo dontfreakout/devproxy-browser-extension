@@ -1,0 +1,65 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on tags that start with 'v', e.g., v1.0.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Update manifest version
+        run: |
+          # Update version in manifest.json to match tag
+          sed -i 's/"version": "[^"]*"/"version": "${{ steps.get_version.outputs.VERSION }}"/' manifest.json
+          cat manifest.json
+
+      - name: Validate manifest.json
+        run: |
+          # Simple validation to ensure manifest.json is valid JSON
+          jq . manifest.json > /dev/null
+          if [ $? -ne 0 ]; then
+            echo "Error: manifest.json is not valid JSON"
+            exit 1
+          fi
+          echo "manifest.json is valid JSON"
+
+      - name: Create extension zip
+        run: |
+          mkdir -p dist
+          zip -r dist/devproxy-extension-${{ steps.get_version.outputs.VERSION }}.zip \
+            manifest.json \
+            background.js \
+            popup.html \
+            popup.js \
+            help.html \
+            help.js \
+            styles/ \
+            icons/ \
+            LICENSE \
+            README.md
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.get_version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+          files: |
+            dist/devproxy-extension-${{ steps.get_version.outputs.VERSION }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

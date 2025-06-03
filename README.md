@@ -61,6 +61,9 @@ Your custom URL will be saved and used for future requests. You can reset to the
 devproxy-browser-extension/
 ├── manifest.json          # Extension configuration
 ├── popup.html             # Popup interface
+├── help.html              # Help page for configuration instructions
+├── help.js                # Logic for help page
+├── background.js          # Background script for handling events
 ├── popup.js               # Popup logic
 ├── styles/
 │   └── popup.css          # Styling
@@ -72,11 +75,30 @@ devproxy-browser-extension/
 
 ### Building for Production
 
-To package the extension for production:
+#### Manual Build
+
+To package the extension for production manually:
 
 1. Make sure all files are in place, including the icon files
 2. Zip the contents of the directory (not the directory itself)
 3. The resulting ZIP file can be uploaded to the Chrome Web Store
+
+#### Automated Release
+
+This project uses GitHub Actions to automatically create releases when a new tag is pushed:
+
+1. Make your changes to the codebase
+2. Commit your changes
+3. Create and push a new tag with the version number:
+   ```
+   git tag v1.0.1
+   git push origin v1.0.1
+   ```
+4. GitHub Actions will automatically:
+   - Update the version in `manifest.json` to match the tag
+   - Build the extension (create a ZIP file)
+   - Create a GitHub release with the ZIP file attached
+5. Download the ZIP file from the GitHub release and upload it to the Chrome Web Store
 
 ## License
 
