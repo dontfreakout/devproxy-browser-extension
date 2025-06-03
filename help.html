@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8"/>
+    <title>DevProxy Help</title>
+    <link rel="stylesheet" href="styles/popup.css">
+    <style>
+        body {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .container {
+            height: auto;
+        }
+
+        .header {
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .title h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .logo {
+            width: 36px;
+            height: 36px;
+            color: var(--color-blue-500);
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            background-color: var(--color-blue-500);
+            color: var(--color-white);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 32px;
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            font-size: 16px;
+            font-weight: 500;
+            min-width: 140px;
+        }
+
+        .back-button:hover {
+            background-color: #2563eb; /* blue-600 */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.12);
+        }
+
+        .back-button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .content {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 32px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .content h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .content h4 {
+            font-size: 18px;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .content p {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--text-color);
+        }
+
+        .content code {
+            font-size: 15px;
+            padding: 3px 6px;
+        }
+
+        .content pre {
+            margin: 16px 0;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+    <div class="container">
+        <header class="header">
+            <div class="title">
+                <div class="logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+                        <!-- Main circle (proxy) -->
+                        <circle cx="24" cy="24" r="10" fill="currentColor" />
+
+                        <!-- Left side (clients) -->
+                        <circle cx="8" cy="16" r="4" fill="currentColor" opacity="0.7" />
+                        <circle cx="8" cy="32" r="4" fill="currentColor" opacity="0.7" />
+
+                        <!-- Right side (servers) -->
+                        <circle cx="40" cy="16" r="4" fill="currentColor" opacity="0.7" />
+                        <circle cx="40" cy="32" r="4" fill="currentColor" opacity="0.7" />
+
+                        <!-- Connection lines -->
+                        <!-- Client to proxy connections -->
+                        <path d="M11 18L20 22" stroke="currentColor" stroke-width="2" />
+                        <path d="M11 30L20 26" stroke="currentColor" stroke-width="2" />
+
+                        <!-- Proxy to server connections -->
+                        <path d="M28 22L37 18" stroke="currentColor" stroke-width="2" />
+                        <path d="M28 26L37 30" stroke="currentColor" stroke-width="2" />
+
+                        <!-- Arrows on connection lines -->
+                        <!-- Client to proxy arrows -->
+                        <path d="M19 20L20 22L17 21" fill="currentColor" />
+                        <path d="M19 28L20 26L17 27" fill="currentColor" />
+
+                        <!-- Proxy to server arrows -->
+                        <path d="M29 20L28 22L31 21" fill="currentColor" />
+                        <path d="M29 28L28 26L31 27" fill="currentColor" />
+                    </svg>
+                </div>
+                <h1>DevProxy Help</h1>
+            </div>
+        </header>
+
+        <div class="content">
+            <h2>Configuration Help</h2>
+
+            <h4>Configure containers for proxy</h4>
+            <p>
+                Configure containers in your <code>docker-compose.yml</code> file by adding hostname, port, and protocol to environment variables:
+            </p>
+            <pre><code>services:
+  my-service:
+    networks:
+      proxy:
+    environment:
+      VIRTUAL_HOST: example.localhost
+      VIRTUAL_PORT: 80 # port of the service
+      VIRTUAL_PROTO: http # (valid options are https or http)</code></pre>
+            <p>
+                For multiple domains on one service, separate with commas: <code>VIRTUAL_HOST: example.localhost,example2.localhost</code>
+            </p>
+
+            <h4>Network Configuration</h4>
+            <p>
+                Add your service and container to the proxy network:
+            </p>
+            <pre><code>networks:
+  proxy:
+    name: proxy_network # match the network name in the script</code></pre>
+        </div>
+
+        <button class="back-button" id="closeButton">
+            <span>Close</span>
+        </button>
+    </div>
+
+    <script src="help.js"></script>
+</body>
+</html>

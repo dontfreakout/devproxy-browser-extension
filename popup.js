@@ -1,5 +1,5 @@
 // Configuration
-const DEFAULT_VHOSTS_URL = 'https://localhost:8443/vhosts.json';
+const DEFAULT_VHOSTS_URL = 'https://localhost/vhosts.json';
 const REFRESH_INTERVAL = 5000; // 5 seconds
 const LOCALSTORAGE_THEME_KEY = 'devproxy-theme';
 const LOCALSTORAGE_COLLAPSED_GROUPS_KEY = 'devproxy-collapsed-groups';
@@ -17,8 +17,6 @@ const themeToggle = document.getElementById('theme-toggle');
 const themeOptions = document.querySelectorAll('[role="radio"]');
 const helpButton = document.getElementById('help-button');
 const noHostsHelpButton = document.getElementById('no-hosts-help-button');
-const helpModal = document.getElementById('help-modal');
-const closeModalButton = document.querySelector('.close-modal');
 const settingsButton = document.getElementById('settings-button');
 const settingsModal = document.getElementById('settings-modal');
 const closeSettingsModalButton = document.querySelector('.close-settings-modal');
@@ -29,6 +27,7 @@ const resetSettingsButton = document.getElementById('reset-settings');
 
 // App state
 let lastData = null;
+let lastHostsList = []; // Track previous hosts for change detection
 let autoRefreshEnabled = true;
 let refreshIntervalId = null;
 let currentTheme = 'system'; // Default to system theme
@@ -344,6 +343,45 @@ function renderHostsList(groups) {
     hostsContainer.classList.remove('hidden');
 }
 
+// Extract hostnames from vhosts data
+function extractHostnames(data) {
+    return data.map(host => {
+        const url = new URL(host.url);
+        return url.hostname;
+    });
+}
+
+// Detect changes between two lists of hosts
+function detectHostChanges(oldHosts, newHosts) {
+    const added = newHosts.filter(host => !oldHosts.includes(host));
+    const removed = oldHosts.filter(host => !newHosts.includes(host));
+
+    return {
+        added,
+        removed,
+        hasChanges: added.length > 0 || removed.length > 0
+    };
+}
+
+// Notify background script about host changes
+function notifyHostChanges(changes) {
+    if (!changes.hasChanges) return;
+
+    chrome.runtime.sendMessage({
+        action: 'hostsChanged',
+        changes: {
+            added: changes.added,
+            removed: changes.removed
+        }
+    }, response => {
+        if (chrome.runtime.lastError) {
+            console.error('Error sending message:', chrome.runtime.lastError);
+        } else if (response && response.success) {
+            console.log('Notification sent successfully');
+        }
+    });
+}
+
 // Check for vhosts.json and handle the data
 async function checkForVhosts() {
     try {
@@ -378,12 +416,35 @@ async function checkForVhosts() {
                     localStorage.setItem(LOCALSTORAGE_COLLAPSED_GROUPS_KEY, JSON.stringify([]));
                 }
 
+                // Detect host changes for notifications
+                const currentHostsList = extractHostnames(data);
+                const changes = detectHostChanges(lastHostsList, currentHostsList);
+
+                // Send notification if there are changes
+                if (changes.hasChanges) {
+                    notifyHostChanges(changes);
+                }
+
+                // Update last hosts list for future change detection
+                lastHostsList = currentHostsList;
+
                 renderHostsList(groupedHosts);
             }
 
             noHostsState.classList.add('hidden');
             hostsContainer.classList.remove('hidden');
         } else {
+            // If we had hosts before but now have none, notify about removal
+            if (lastHostsList.length > 0) {
+                const changes = {
+                    added: [],
+                    removed: lastHostsList,
+                    hasChanges: lastHostsList.length > 0
+                };
+                notifyHostChanges(changes);
+                lastHostsList = [];
+            }
+
             loadingState.classList.add('hidden');
             hostsContainer.classList.add('hidden');
             noHostsState.classList.remove('hidden');
@@ -406,14 +467,9 @@ async function checkForVhosts() {
     }
 }
 
-// Show help modal
-function showHelpModal() {
-    helpModal.classList.add('active');
-}
-
-// Hide help modal
-function hideHelpModal() {
-    helpModal.classList.remove('active');
+// Open help page
+function openHelpPage() {
+    window.open('help.html', '_blank');
 }
 
 // Show settings modal
@@ -463,6 +519,33 @@ function loadSavedVhostsUrl() {
     }
 }
 
+// Initialize hosts list without triggering notifications
+async function initializeHostsList() {
+    try {
+        const response = await fetch(currentVhostsUrl, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        });
+
+        if (!response.ok) {
+            console.error(`Failed to initialize hosts list: ${response.status}`);
+            return;
+        }
+
+        const data = await response.json();
+
+        if (data && Array.isArray(data) && data.length > 0) {
+            // Initialize lastHostsList with current hosts
+            lastHostsList = extractHostnames(data);
+            console.log('Initialized hosts list with', lastHostsList.length, 'hosts');
+        }
+    } catch (error) {
+        console.error('Error initializing hosts list:', error);
+    }
+}
+
 // Initialize and set up periodic refresh
 function init() {
     // Initialize theme based on saved preferences or system preference
@@ -470,6 +553,9 @@ function init() {
 
     // Load saved vhosts URL
     loadSavedVhostsUrl();
+
+    // Initialize lastHostsList
+    initializeHostsList();
 
     // Add event listeners for theme options
     themeOptions.forEach(option => {
@@ -491,10 +577,9 @@ function init() {
     // Add event listener for refresh control
     refreshControl.addEventListener('click', toggleAutoRefresh);
 
-    // Help modal functionality
-    helpButton.addEventListener('click', showHelpModal);
-    noHostsHelpButton.addEventListener('click', showHelpModal);
-    closeModalButton.addEventListener('click', hideHelpModal);
+    // Help page functionality
+    helpButton.addEventListener('click', openHelpPage);
+    noHostsHelpButton.addEventListener('click', openHelpPage);
 
     // Settings modal functionality
     settingsButton.addEventListener('click', showSettingsModal);
@@ -502,28 +587,17 @@ function init() {
     settingsForm.addEventListener('submit', saveSettings);
     resetSettingsButton.addEventListener('click', resetSettings);
 
-    // Close modals when clicking outside of modal content
-    helpModal.addEventListener('click', (event) => {
-        if (event.target === helpModal) {
-            hideHelpModal();
-        }
-    });
-
+    // Close modal when clicking outside of modal content
     settingsModal.addEventListener('click', (event) => {
         if (event.target === settingsModal) {
             hideSettingsModal();
         }
     });
 
-    // Close modals with Escape key
+    // Close modal with Escape key
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            if (helpModal.classList.contains('active')) {
-                hideHelpModal();
-            }
-            if (settingsModal.classList.contains('active')) {
-                hideSettingsModal();
-            }
+        if (event.key === 'Escape' && settingsModal.classList.contains('active')) {
+            hideSettingsModal();
         }
     });
 

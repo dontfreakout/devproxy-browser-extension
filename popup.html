@@ -117,39 +117,6 @@
         </main>
     </div>
 
-    <!-- Help Modal -->
-    <div id="help-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Configuration Help</h3>
-                <button class="close-modal" aria-label="Close modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <h4>Configure containers for proxy</h4>
-                <p>
-                    Configure containers in your <code>docker-compose.yml</code> file by adding hostname, port, and protocol to environment variables:
-                </p>
-                <pre><code>services:
-  my-service:
-    networks:
-      proxy:
-    environment:
-      VIRTUAL_HOST: example.localhost
-      VIRTUAL_PORT: 80 # port of the service
-      VIRTUAL_PROTO: http # (valid options are https or http)</code></pre>
-                <p>
-                    For multiple domains on one service, separate with commas: <code>VIRTUAL_HOST: example.localhost,example2.localhost</code>
-                </p>
-                <h4>Network Configuration</h4>
-                <p>
-                    Add your service and container to the proxy network:
-                </p>
-                <pre><code>networks:
-  proxy:
-    name: proxy_network # match the network name in the script</code></pre>
-            </div>
-        </div>
-    </div>
 
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal">

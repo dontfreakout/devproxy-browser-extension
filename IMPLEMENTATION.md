@@ -43,6 +43,14 @@ The extension automatically refreshes the list of virtual hosts every 5 seconds.
 - Pause/resume auto-refresh by clicking the refresh indicator
 - See the current refresh status
 
+#### Host Change Notifications
+
+The extension monitors changes in the available virtual hosts and displays notifications:
+- Shows notifications when new hosts are added
+- Shows notifications when hosts are removed
+- Displays the number of hosts changed and their names
+- Clicking on a notification opens the extension popup
+
 #### Collapsible Groups
 
 Virtual hosts are grouped by domain and displayed in collapsible sections:
@@ -99,7 +107,6 @@ Potential future enhancements:
 2. Implement search functionality for filtering hosts
 3. Add the ability to pin favorite hosts
 4. Support for custom API endpoints
-5. Add notifications for new hosts
 
 ## Conclusion
 
