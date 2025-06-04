@@ -3,6 +3,11 @@
   "name": "DevProxy Virtual Hosts",
   "version": "1.0",
   "description": "Chrome extension for listing local sites served by devproxy",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "devproxy@dontfreakout"
+    }
+  },
   "permissions": [
     "storage",
     "notifications"
@@ -12,7 +17,10 @@
     "https://localhost/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "scripts": [
+      "background.js"
+    ]
   },
   "action": {
     "default_popup": "popup.html",
