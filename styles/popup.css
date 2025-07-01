@@ -410,6 +410,9 @@ main {
 .icon-kafka { background-color: var(--color-sky-500); }
 .icon-kafka:after { content: "KFK"; }
 
+.icon-db { background-color: var(--color-violet-500); }
+.icon-db:after { content: "DB"; }
+
 .icon-default { background-color: var(--color-slate-500); }
 .icon-default:after { content: "SVC"; }
 

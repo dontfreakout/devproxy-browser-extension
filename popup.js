@@ -42,7 +42,12 @@ function getServiceIconClass(hostname) {
     // Return the appropriate icon class based on the prefix
     switch (prefix) {
         case 'api': return 'icon-api';
-        case 'fe': return 'icon-fe';
+        case 'fe':
+        case 'frontend':
+        case 'front':
+        case 'web':
+        case 'www':
+            return 'icon-fe';
         case 'cdn': return 'icon-cdn';
         case 'docs': return 'icon-docs';
         case 'admin':
@@ -64,6 +69,16 @@ function getServiceIconClass(hostname) {
         case 'kadeck':
         case 'kafka':
             return 'icon-kafka';
+        case 'adminer':
+        case 'db':
+        case 'database':
+        case 'pgadmin':
+        case 'pg':
+        case 'mysql':
+        case 'mariadb':
+        case 'mysqladmin':
+        case 'dbadmin':
+            return 'icon-db';
         default: return 'icon-default';
     }
 }

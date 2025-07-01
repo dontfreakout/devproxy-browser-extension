@@ -1,6 +1,6 @@
 # DevProxy Browser Extension
 
-A Chrome extension for listing and accessing local sites served by [DevProxy](https://github.com/dontfreakout/dev-proxy).
+A browser extension for Chrome and Firefox for listing and accessing local sites served by [DevProxy](https://github.com/dontfreakout/dev-proxy).
 
 ## Features
 
@@ -98,6 +98,7 @@ This project uses GitHub Actions to automatically create releases when a new tag
    - Update the version in `manifest.json` to match the tag
    - Build the extension (create a ZIP file)
    - Create a GitHub release with the ZIP file attached
+   - Sign and publish the extension to the Mozilla Add-ons Store
 5. Download the ZIP file from the GitHub release and upload it to the Chrome Web Store
 
 ## License
